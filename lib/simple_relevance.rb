@@ -5,34 +5,24 @@ require 'httparty'
 # free to use and unlicensed
 # requires httparty
 
-# you can get an API key by signing up for SimpleRelevance on the site. Signup is free.
-# async: when you are done testing, set async=1. This will speed up API response times by a factor of 2 or 3.
-# predictions: this is the part of SimpleRelevance that eventually costs money to use. They will not be available right away, as our automated model builds happen nightly. Please get in touch during business hours (inquiries@simplerelevance.com) if you want us to build a model sooner.
-
-# documentation: note that documentation is available at simplerelevance.com/docs/api2
-
-# also, I have not used ruby in more than a year, so I apologize for creaky/ugly code. Anyway, all functionality has been tested.
-
-# BATCH MODE: note that converting to use batch mode is easy - all POST requests accept a list, as you can see, so simply modify the requests to take a list of hashes as input.
-
 class SimpleRelevance
   include HTTParty
 
-  def initialize(key,async=0)
-    @api_key=key
+  def initialize(username, api_key, async=0)
     @async=async
+    @basic_auth = {:password => api_key, :username => username}
   end
 
   def _post(endpoint,post_data)
-    data = {:api_key=>@api_key,:async=>@async,:data=>post_data}
-    self.class.post("https://www.simplerelevance.com/api/v3/#{endpoint}",:body => JSON.dump(data), :options => {:headers => {'Content-Type'=>'application/json', :accept =>'application/json'}})
+    data = {:async=>@async,:data=>post_data}
+    self.class.post("https://www.simplerelevance.com/api/v3/#{endpoint}", :basic_auth => @basic_auth, :body => JSON.dump(data), :options => {:headers => {'Content-Type'=>'application/json', :accept =>'application/json'}})
   end
 
   def _get(endpoint,get_data)
-    data = {:api_key=>@api_key,:async=>@async}
+    data = {:async=>@async}
     data.merge!(get_data)
     puts data
-    self.class.get("https://www.simplerelevance.com/api/v3/#{endpoint}",:query => data)
+    self.class.get("https://www.simplerelevance.com/api/v3/#{endpoint}", :basic_auth => @basic_auth, :query => data)
   end
 
   def add_user(email,opts={})
