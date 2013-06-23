@@ -25,14 +25,14 @@ class SimpleRelevance
 
   def _post(endpoint,post_data)
     data = {:api_key=>@api_key,:async=>@async,:data=>post_data}
-    self.class.post("https://simplerelevance.com/api/v2/#{endpoint}",:body => JSON.dump(data), :options => {:headers => {'Content-Type'=>'application/json', :accept =>'application/json'}})
+    self.class.post("https://www.simplerelevance.com/api/v3/#{endpoint}",:body => JSON.dump(data), :options => {:headers => {'Content-Type'=>'application/json', :accept =>'application/json'}})
   end
 
   def _get(endpoint,get_data)
     data = {:api_key=>@api_key,:async=>@async}
     data.merge!(get_data)
     puts data
-    self.class.get("https://simplerelevance.com/api/v2/#{endpoint}",:query => data)
+    self.class.get("https://www.simplerelevance.com/api/v3/#{endpoint}",:query => data)
   end
 
   def add_user(email,opts={})
