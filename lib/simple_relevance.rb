@@ -67,6 +67,7 @@ class SimpleRelevance
     add_action(opts.merge(action_type: ActionType::CLICK))
   end
 
+  # NOTE: appears to require email, even though simplerelevance docs do not state this
   def add_purchase(opts={})
     add_action(opts.merge(action_type: ActionType::PURCHASE))
   end
@@ -75,6 +76,7 @@ class SimpleRelevance
     add_action(opts.merge(action_type: ActionType::EMAIL_OPEN))
   end
 
+  # FIXME: I don't think this is the right API
   def get_predictions(email,opts={})
     opts[:email] = email
     self._get('items/', opts)

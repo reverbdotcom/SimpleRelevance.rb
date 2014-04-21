@@ -18,6 +18,4 @@ puts sr.add_user("user2@foo.com", 1, data_dict: {testingagain: "2"})
 puts sr.add_item("someitem", 1, data_dict: {testattr: "wahoo"})
 puts sr.add_click(user_id: 1, item_id: 1)
 puts sr.add_email_open(user_id: 1, item_id: 1)
-#FIXME: purchase call is not working
-# puts sr.add_purchase(user_id: 2, item_id: 1)
-puts sr.get_predictions('user1@foo.com')
+puts sr.add_purchase(email: "user1@foo.com", user_id: 2, item_id: 1)
