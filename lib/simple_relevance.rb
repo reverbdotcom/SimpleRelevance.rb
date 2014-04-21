@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'httparty'
+require 'json'
 
 # A Ruby API wrapper for SimpleRelevance
 # free to use and unlicensed
