@@ -2,6 +2,8 @@ require 'rubygems'
 require 'httparty'
 require 'json'
 
+require_relative 'simple_relevance/action_type'
+
 # A Ruby API wrapper for SimpleRelevance
 # free to use and unlicensed
 # requires httparty
@@ -11,54 +13,83 @@ class SimpleRelevance
 
   def initialize(username, api_key, async=0)
     @async=async
-    @basic_auth = {:password => api_key, :username => username}
+    @basic_auth = {password: api_key, username: username}
   end
 
   def _post(endpoint,post_data)
-    data = {:async=>@async,:data=>post_data}
-    self.class.post("https://www.simplerelevance.com/api/v3/#{endpoint}", :basic_auth => @basic_auth, :body => JSON.dump(data), :options => {:headers => {'Content-Type'=>'application/json', :accept =>'application/json'}})
+    data = post_data.merge(async: @async)
+    self.class.post("https://www.simplerelevance.com/api/v3/#{endpoint}", basic_auth: @basic_auth, body: JSON.dump(data), options: {headers: {'Content-Type'=>'application/json', accept:'application/json'}})
   end
 
-  def _get(endpoint,get_data)
-    data = {:async=>@async}
-    data.merge!(get_data)
-    puts data
-    self.class.get("https://www.simplerelevance.com/api/v3/#{endpoint}", :basic_auth => @basic_auth, :query => data)
+  def _get(endpoint, params)
+    params = params.merge(async: @async)
+    self.class.get("https://www.simplerelevance.com/api/v3/#{endpoint}", basic_auth: @basic_auth, query: params)
   end
 
-  def add_user(email,opts={})
-    zipcode = opts[:zipcode] || nil
-    user_id = opts[:user_id] || nil
-    data_dict = opts[:data_dict] || {}
-
-    payload = [{:email=>email,:zipcode=>zipcode,:user_id=>user_id,:data_dict=>data_dict}]
-    self._post('users/',payload)
+  # Reserved keys:
+  # -first_name (users only)
+  # -last_name (users only)
+  # -twitter_handle (users only)
+  # -image_url (users and items)
+  def add_user(email, user_id, opts={})
+    self._post('users/', opts.merge(email: email, user_id: user_id))
   end
 
-  def add_item(item_name,item_id,opts={})
+  # Reserved Key List:
+  # -latitude
+  # -longitude
+  # -business_name (business items only) - this attribute is very important! If you have a business as an item, upload a clear and well-chosen business_name.
+  # -market (items only)
+  # -neighborhood (items only)
+  # -zipcode
+  # -sku (product items and variants only)
+  # -image_url (users and items)
+  # -image_url_small (items only)
+  # -item_url (items only)
+  # -price (items and variants only)
+  # -starts (items and variants only)
+  # -expires (items and variants only)
+  # -description (items only)
+  # -in_stock (items only)
+  # -name (variants only)
+  # -external_id (variants only)
+  # -discount (items and variants only) - this can be in a variety of formats. "2%",20,.2,".2" - any string or number larger than 1 will be treated as "$$ off" and used along with price info to calculate percent discount.
+  def add_item(item_name, item_id, opts={})
     item_type = opts[:item_type] || 'product'
-    data_dict = opts[:data_dict] || {}
-    variants = opts[:variants] || {}
+    data_dict = opts[:data_dict]
+    variants = opts[:variants]
 
-    payload = [{:item_name=>item_name,:item_id=>item_id,:item_type=>item_type,:data_dict=>data_dict,:variants=>variants}]
+    payload = {item_name: item_name, item_id: item_id, item_type: item_type, data_dict:data_dict, variants:variants}
     self._post('items/',payload)
   end
 
-  # action_hook should be "clicks/" or "purchases/"
-  # takes: action_hook="purchases/",user_id=nil,item_id=nil,email=nil,item_name=nil,timestamp=nil,price=nil,zipcode=nil
-
-  def add_action(opts={})
-    action_hook = opts[:action_hook] || "purchases/"
-    opts.delete(:action_hook)
-    payload = [opts]
-    self._post(action_hook,payload)
+  def add_click(opts={})
+    add_action(opts.merge(action_type: ActionType::CLICK))
   end
 
+  def add_purchase(opts={})
+    add_action(opts.merge(action_type: ActionType::PURCHASE))
+  end
+
+  def add_email_open(opts={})
+    add_action(opts.merge(action_type: ActionType::EMAIL_OPEN))
+  end
 
   def get_predictions(email,opts={})
-    opts[:email]=email
-    self._get('items/',opts)
+    opts[:email] = email
+    self._get('items/', opts)
   end
+
+  private
+
+  # action_type: purchases (action type 1), clicks (action type 0), and email opens (action type 5)
+  # required: item_id or item_name, user_id or email, action_type
+  # Highly suggested parameters include timestamp (in UTC), price, zipcode, and,
+  # if you are matching a preexisting item by name and not by item_id, item_type.
+  def add_action(opts={})
+    self._post("actions/", opts)
+  end
+
 
 end
 
