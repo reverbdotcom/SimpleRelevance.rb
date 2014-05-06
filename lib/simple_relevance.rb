@@ -11,7 +11,7 @@ require_relative 'simple_relevance/action_type'
 class SimpleRelevance
   include HTTParty
 
-  def initialize(username=ENV["SIMPLE_RELEVANCE_USERNAME"] , api_key=ENV["SIMPLE_RELEVANCE_API_KEY"] , async=0)
+  def initialize(username=ENV["SIMPLE_RELEVANCE_USERNAME"] , api_key=ENV["SIMPLE_RELEVANCE_API_KEY"] , async=1)
     @async = async
     @basic_auth = {password: api_key, username: username}
   end

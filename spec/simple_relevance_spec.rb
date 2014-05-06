@@ -30,7 +30,7 @@ describe SimpleRelevance do
       raise "Please specify SIMPLE_RELEVANCE_API_KEY and SIMPLE_RELEVANCE_USERNAME in your environment to run tests."
     end
 
-    SimpleRelevance.new(username, api_key, async=0)
+    SimpleRelevance.new(username, api_key, async=1)
   end
 
   it "adds users" do
