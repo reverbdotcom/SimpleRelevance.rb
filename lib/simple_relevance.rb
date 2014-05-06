@@ -31,8 +31,8 @@ class SimpleRelevance
   # -image_url (users and items)
   def add_user(opts={})
     payload = {
-      email:     opts[:email]   || raise("email is required"),
-      user_id:   opts[:user_id] || raise("user_id is required"),
+      email:     opts.delete(:email)   || raise("email is required"),
+      user_id:   opts.delete(:user_id) || raise("user_id is required"),
       data_dict: opts
     }
 
@@ -64,10 +64,10 @@ class SimpleRelevance
   # -discount (items and variants only) - this can be in a variety of formats. "2%",20,.2,".2" - any string or number larger than 1 will be treated as "$$ off" and used along with price info to calculate percent discount.
   def add_item(opts={})
     payload = {
-      item_id:    opts[:item_id]   || raise("item_id is required"),
-      item_name:  opts[:item_name] || raise("item_name is required"),
-      item_type:  opts[:item_type] || 'product',
-      variants:   opts[:variants],
+      item_id:    opts.delete(:item_id)   || raise("item_id is required"),
+      item_name:  opts.delete(:item_name) || raise("item_name is required"),
+      item_type:  opts.delete(:item_type) || 'product',
+      variants:   opts.delete(:variants),
       data_dict:  opts
     }
     self._post('items/', payload)
