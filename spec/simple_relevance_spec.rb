@@ -18,7 +18,7 @@ RSpec::Matchers.define :be_successful do |expected|
   end
 end
 
-describe SimpleRelevance do
+describe SimpleRelevance::Client do
   use_vcr_cassette
 
   let(:email) { "user1@foo.com" }
@@ -30,7 +30,7 @@ describe SimpleRelevance do
       raise "Please specify SIMPLE_RELEVANCE_API_KEY and SIMPLE_RELEVANCE_USERNAME in your environment to run tests."
     end
 
-    SimpleRelevance.new(username, api_key, async=1)
+    described_class.new(username, api_key, async=1)
   end
 
   it "adds users" do
@@ -59,7 +59,7 @@ describe SimpleRelevance do
 
   describe "class level api call" do
     it "adds users" do
-      SimpleRelevance.call_api(username: username, api_key: api_key, method: :add_user, opts: {
+      described_class.call_api(username: username, api_key: api_key, method: :add_user, opts: {
         user_id: 1,
         email: "foo@bar.com"
       }).should be_successful
