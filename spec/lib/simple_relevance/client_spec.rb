@@ -40,8 +40,8 @@ describe SimpleRelevance::Client do
   end
 
   it "batch adds users" do
-    sr.batch_add_user(
-      [
+    sr.batch_add_users(
+      users: [
         { email: email, user_id: 1, some_property: "my value" },
         { email: email2, user_id: 2, some_property: "some prop" }
       ]
@@ -63,7 +63,7 @@ describe SimpleRelevance::Client do
   end
 
   it "batch adds items" do
-    sr.batch_add_item([
+    sr.batch_add_items(items:[
       {
         item_name: "foo-item1",
         item_id: "101-foo",
@@ -88,7 +88,7 @@ describe SimpleRelevance::Client do
   end
 
   it "batch tracks clicks" do
-    sr.batch_add_clicks([
+    sr.batch_add_clicks(clicks: [
       { user_id: 100, item_id: "101-foo"},
       { user_id: 101, item_id: "102-foo"}
     ]).should be_successful
@@ -99,7 +99,7 @@ describe SimpleRelevance::Client do
   end
 
   it "batch tracks email opens" do
-    sr.batch_add_email_opens([
+    sr.batch_add_email_opens(email_opens: [
       { user_id: 100, item_id: "101-foo"},
       { user_id: 101, item_id: "102-foo"}
     ]).should be_successful
@@ -109,6 +109,14 @@ describe SimpleRelevance::Client do
     sr.add_purchase(user_id: 1, item_id: 1).should be_successful
   end
 
+  it "batch tracks purchases" do
+    sr.batch_add_purchases(purchases: [
+      { user_id: 100, item_id: "101-foo"},
+      { user_id: 101, item_id: "102-foo"}
+    ]).should be_successful
+  end
+
+
   describe "class level api call" do
     it "adds users" do
       described_class.call_api(username: username, api_key: api_key, method: :add_user, opts: {
@@ -117,5 +125,16 @@ describe SimpleRelevance::Client do
       }).should be_successful
     end
 
+    it "adds users in bulk" do
+      described_class.call_api(username: username, api_key: api_key, 
+        method: :batch_add_users, opts: {
+        users: [
+          {
+            user_id: 1,
+            email: "foo@bar.com"
+          }
+        ]
+      }).should be_successful
+    end
   end
 end

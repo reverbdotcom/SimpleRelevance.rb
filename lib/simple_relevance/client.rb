@@ -21,7 +21,7 @@ module SimpleRelevance
     # Useful for use with e.g. sidekiq delayed extensions
     #
     # e.g. SimpleRelevance.delay.call_api(username: "foo", api_key: "bar", method: :get_user, opts: { email: "foo@bar.com" }
-    def self.call_api(username: ENV["SIMPLE_RELEVANCE_USERNAME"], api_key: ENV["SIMPLE_RELEVANCE_API_KEY"], method:, async: 1, opts:{})
+    def self.call_api(username: ENV["SIMPLE_RELEVANCE_USERNAME"], api_key: ENV["SIMPLE_RELEVANCE_API_KEY"], method:, async: 1, opts:)
       new(username, api_key, async).send(method, opts)
     end
 
@@ -39,9 +39,11 @@ module SimpleRelevance
     end
 
     # Takes an array of user hashes. The hashes must look like users you would pass to #add_user
-    def batch_add_user(users=[])
+    def batch_add_users(opts={})
+      opts[:users] || raise("Please specify users as an array: batch_add_users(users: [{...}])")
+
       payload = {
-        batch: users.map { |user_info| user_payload(user_info) }
+        batch: opts[:users].map { |user_info| user_payload(user_info) }
       }
 
       self._post('users/', payload)
@@ -78,9 +80,11 @@ module SimpleRelevance
     end
 
     # Takes an array of hashes. The hashes must look like items you would pass to #add_item
-    def batch_add_item(items=[])
+    def batch_add_items(opts={})
+      opts[:items] || raise("Please specify items as an array: batch_add_items(items: [{...}])")
+
       payload = {
-        batch: items.map { |item_info| item_payload(item_info) }
+        batch: opts[:items].map { |item_info| item_payload(item_info) }
       }
 
       self._post('items/', payload)
@@ -90,27 +94,31 @@ module SimpleRelevance
       add_action(opts.merge(action_type: ActionType::CLICK))
     end
 
-    def batch_add_clicks(clicks=[])
-      clicks.map! {|click_info| click_info.merge!(action_type: ActionType::CLICK)}
-      batch_add_action(clicks)
+    def batch_add_clicks(opts={})
+      opts[:clicks] || raise("Please specify clicks as an array: batch_add_clicks(clicks: [{...}])")
+
+      opts[:clicks].map! {|click_info| click_info.merge!(action_type: ActionType::CLICK)}
+      batch_add_action(opts[:clicks])
     end
 
     def add_purchase(opts={})
       add_action(opts.merge(action_type: ActionType::PURCHASE))
     end
 
-    def batch_add_purchases(purchases=[])
-      purchases.map! {|purchase_info| purchase_info.merge!(action_type: ActionType::PURCHASE)}
-      batch_add_action(purchases)
+    def batch_add_purchases(opts={})
+      opts[:purchases] || raise("Please specify purchases as an array: batch_add_purchases(purchases: [{...}])")
+      opts[:purchases].map! {|purchase_info| purchase_info.merge!(action_type: ActionType::PURCHASE)}
+      batch_add_action(opts[:purchases])
     end
 
     def add_email_open(opts={})
       add_action(opts.merge(action_type: ActionType::EMAIL_OPEN))
     end
 
-    def batch_add_email_opens(email_opens=[])
-      email_opens.map! {|email_open_info| email_open_info.merge!(action_type: ActionType::EMAIL_OPEN)}
-      batch_add_action(email_opens)
+    def batch_add_email_opens(opts={})
+      opts[:email_opens] || raise("Please specify email_opens as an array: batch_add_email_opens(email_opens: [{...}])")
+      opts[:email_opens].map! {|email_open_info| email_open_info.merge!(action_type: ActionType::EMAIL_OPEN)}
+      batch_add_action(opts[:email_opens])
     end
 
     def get_predictions(opts={})
@@ -142,8 +150,6 @@ module SimpleRelevance
       payload = {
         batch: actions.map { |action_info| action_payload(action_info) }
       }
-
-      puts payload.inspect
 
       self._post('actions/', payload)
     end
