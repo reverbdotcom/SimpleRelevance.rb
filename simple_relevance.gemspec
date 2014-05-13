@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.summary = 'Ruby wrapper to SimpleRelevance API.'
   s.description = 'Ruby wrapper to SimpleRelevance API. Allows you to upload data and to pull down recommendations.'
 
+  s.add_dependency 'activesupport'
   s.add_dependency 'httparty'
   # s.add_development_dependency 'rspec'  # What does this do, exactly?
 

@@ -71,12 +71,14 @@ describe SimpleRelevance::Client do
         item_url: "http://foo.com/bar1",
         image_url: "http://google.com/some.png"
       },
+
+      # Testing string keys below
       {
         item_name: "foo-item2",
         item_id: "102-foo",
         testattr: "wahoo",
-        item_url: "http://foo.com/bar2",
-        image_url: "http://google.com/some.png"
+        "item_url" => "http://foo.com/bar2",
+        "image_url" => "http://google.com/some.png"
       }
     ]).should be_successful
   end

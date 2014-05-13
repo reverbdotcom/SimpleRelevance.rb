@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'httparty'
 require 'json'
+require 'active_support/core_ext/hash/indifferent_access'
 
 require_relative 'action_type'
 
@@ -192,6 +193,7 @@ module SimpleRelevance
     end
 
     def user_payload(opts)
+      opts = opts.with_indifferent_access
       {
         email:     opts.delete(:email)   || raise("email is required"),
         user_id:   opts.delete(:user_id) || raise("user_id is required"),
@@ -200,6 +202,7 @@ module SimpleRelevance
     end
 
     def item_payload(opts)
+      opts = opts.with_indifferent_access
       opts[:item_url]  || raise("item_url is required and must point to an internet accessible url")
       opts[:image_url] || raise("image_url is required")
 
@@ -213,6 +216,7 @@ module SimpleRelevance
     end
 
     def action_payload(opts)
+      opts = opts.with_indifferent_access
       opts[:item_id] || raise("item_id is required")
       opts[:user_id] || raise("user_id is required")
       opts[:action_type] || raise("action_type is required")
