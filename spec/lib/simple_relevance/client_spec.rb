@@ -54,7 +54,7 @@ describe SimpleRelevance::Client do
 
   it "adds items" do
     sr.add_item(
-      item_name: "someitem",
+      item_name: "some & item with ampersand",
       item_id: "100-foo",
       testattr: "wahoo",
       item_url: "http://foo.com/bar",
@@ -65,7 +65,7 @@ describe SimpleRelevance::Client do
   it "batch adds items" do
     sr.batch_add_items(items:[
       {
-        item_name: "foo-item1",
+        item_name: "foo-item1 & ampersand test",
         item_id: "101-foo",
         testattr: "wahoo",
         item_url: "http://foo.com/bar1",

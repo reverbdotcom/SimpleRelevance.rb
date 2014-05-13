@@ -12,6 +12,16 @@ module SimpleRelevance
   class Client
     include HTTParty
 
+    # Tap into HTTParty debugging
+    def self.enable_debug
+      debug_output $stdout
+    end
+
+    # Disable HTTParty debugging
+    def self.disable_debug
+      debug_output nil
+    end
+
     def initialize(username=ENV["SIMPLE_RELEVANCE_USERNAME"] , api_key=ENV["SIMPLE_RELEVANCE_API_KEY"], async=1)
       @async = async
       @basic_auth = {password: api_key, username: username}
@@ -127,7 +137,8 @@ module SimpleRelevance
     end
 
     def _post(endpoint, post_data)
-      data = post_data.merge(async: @async)
+      data = cgi_escape_hash( post_data.merge(async: @async) )
+
       self.class.post("https://www.simplerelevance.com/api/v3/#{endpoint}", basic_auth: @basic_auth, body: JSON.dump(data), options: {headers: {'Content-Type'=>'application/json', accept:'application/json'}})
     end
 
@@ -137,6 +148,32 @@ module SimpleRelevance
     end
 
     private
+
+    # SR API chokes on unescaped values like ampersands
+    def cgi_escape_hash(hash)
+      hash.inject({}) do |h, (k,v)|
+        h[k] = escape_value(v); h
+      end
+    end
+
+    def cgi_escape_array(array)
+      array.map do |array_item|
+        escape_value(array_item)
+      end
+    end
+
+    # Recursively escape all values in a hash.
+    def escape_value(value)
+      if value.is_a?(Hash)
+        cgi_escape_hash(value)
+      elsif value.is_a?(Array)
+        cgi_escape_array(value)
+      else
+        # Correctly return nil if the value is not there
+        value && CGI.escape(value.to_s)
+      end
+    end
+
 
     # action_type: purchases (action type 1), clicks (action type 0), and email opens (action type 5)
     # required: item_id or item_name, user_id or email, action_type

@@ -8,15 +8,19 @@ A Ruby wrapper for the SimpleRelevance API (www.simplerelevance.com).
 gem install simple_relevance
 ```
 
-## Requirements
+## Debug
 
-* httparty
+You can turn on HTTParty debugging, which will log to stdout:
 
+```ruby
+  SimpleRelevance::Client.enable_debug
+```
 
-## Examples
+Or turn it off
 
-Coming soon.
-
+```ruby
+  SimpleRelevance::Client.disable_debug
+```
 
 ## Help and Docs
 
