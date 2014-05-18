@@ -171,8 +171,14 @@ module SimpleRelevance
         cgi_escape_array(value)
       else
         # Correctly return nil if the value is not there
-        value && CGI.escape(value.to_s)
+        value && CGI.escape(clean_value(value))
       end
+    end
+
+
+    def clean_value(value)
+      # Simple Relevance does not like escaped quotes, replace with single quotes
+      value.to_s.gsub("\"", "'")
     end
 
 

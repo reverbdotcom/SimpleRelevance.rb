@@ -1,0 +1,5 @@
+Version 0.1.2
+	* Replace double quotes in values with single quotes
+
+Version 0.1.1
+	* CGI escape values because SimpleRelevance blows up on certain characters

@@ -54,7 +54,7 @@ describe SimpleRelevance::Client do
 
   it "adds items" do
     sr.add_item(
-      item_name: "some & item with ampersand",
+      item_name: "some & item with ampersand and \"quotes\"",
       item_id: "100-foo",
       testattr: "wahoo",
       item_url: "http://foo.com/bar",
