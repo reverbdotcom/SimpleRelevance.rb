@@ -101,35 +101,36 @@ module SimpleRelevance
       self._post('items/', payload)
     end
 
-    def add_click(opts={})
-      add_action(opts.merge(action_type: ActionType::CLICK))
+    def add_email_click(opts={})
+      add_action(opts.merge(action_type: ActionType::EMAIL_CLICK))
     end
 
-    def batch_add_clicks(opts={})
-      opts[:clicks] || raise("Please specify clicks as an array: batch_add_clicks(clicks: [{...}])")
+    def batch_add_email_clicks(clicks:)
+      batch_add_action(clicks, ActionType::EMAIL_CLICK)
+    end
 
-      opts[:clicks].map! {|click_info| click_info.merge!(action_type: ActionType::CLICK)}
-      batch_add_action(opts[:clicks])
+    def add_item_view(opts={})
+      add_action(opts.merge(action_type: ActionType::ITEM_VIEW))
+    end
+
+    def batch_add_item_views(views:)
+      batch_add_action(views, ActionType::ITEM_VIEW)
     end
 
     def add_purchase(opts={})
       add_action(opts.merge(action_type: ActionType::PURCHASE))
     end
 
-    def batch_add_purchases(opts={})
-      opts[:purchases] || raise("Please specify purchases as an array: batch_add_purchases(purchases: [{...}])")
-      opts[:purchases].map! {|purchase_info| purchase_info.merge!(action_type: ActionType::PURCHASE)}
-      batch_add_action(opts[:purchases])
+    def batch_add_purchases(purchases:)
+      batch_add_action(purchases, ActionType::PURCHASE)
     end
 
     def add_email_open(opts={})
       add_action(opts.merge(action_type: ActionType::EMAIL_OPEN))
     end
 
-    def batch_add_email_opens(opts={})
-      opts[:email_opens] || raise("Please specify email_opens as an array: batch_add_email_opens(email_opens: [{...}])")
-      opts[:email_opens].map! {|email_open_info| email_open_info.merge!(action_type: ActionType::EMAIL_OPEN)}
-      batch_add_action(opts[:email_opens])
+    def batch_add_email_opens(email_opens:)
+      batch_add_action(email_opens, ActionType::EMAIL_OPEN)
     end
 
     def get_predictions(opts={})
@@ -149,6 +150,10 @@ module SimpleRelevance
     end
 
     private
+
+    def add_action_type(array_of_info_hashes, action_type)
+      array_of_info_hashes.map! {|info| info.merge!(action_type: action_type)}
+    end
 
     # SR API chokes on unescaped values like ampersands
     def cgi_escape_hash(hash)
@@ -178,7 +183,7 @@ module SimpleRelevance
 
     def clean_value(value)
       # Simple Relevance does not like escaped quotes, replace with single quotes
-      value.to_s.gsub("\"", "'")
+      value.to_s.gsub(/[\"\t]/, "")
     end
 
 
@@ -190,9 +195,11 @@ module SimpleRelevance
       self._post("actions/", action_payload(opts))
     end
 
-    def batch_add_action(actions=[])
+    def batch_add_action(actions=[], action_type)
       payload = {
-        batch: actions.map { |action_info| action_payload(action_info) }
+        batch: actions.map do |action_info|
+          action_payload(action_info, action_type)
+        end
       }
 
       self._post('actions/', payload)
@@ -221,11 +228,11 @@ module SimpleRelevance
       }
     end
 
-    def action_payload(opts)
+    def action_payload(opts, action_type = opts[:action_type])
       opts = opts.with_indifferent_access
       opts[:item_id] || raise("item_id is required")
       opts[:user_id] || raise("user_id is required")
-      opts[:action_type] || raise("action_type is required")
+      action_type || raise("action_type is required")
       opts
     end
   end

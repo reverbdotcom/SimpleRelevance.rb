@@ -14,8 +14,7 @@ require 'rspec/expectations'
 
 RSpec::Matchers.define :be_successful do |expected|
   match do |actual|
-    puts actual["code"]
-    actual["message"] == "success"
+    [200, 201].include?(actual.code)
   end
 end
 
@@ -54,7 +53,7 @@ describe SimpleRelevance::Client do
 
   it "adds items" do
     sr.add_item(
-      item_name: "some & item with ampersand and \"quotes\"",
+      item_name: "some & item with ampersand and \t character w/ a slash and \"quotes\"",
       item_id: "100-foo",
       testattr: "wahoo",
       item_url: "http://foo.com/bar",
@@ -83,14 +82,20 @@ describe SimpleRelevance::Client do
     ]).should be_successful
   end
 
-  it "tracks clicks" do
-    # sr.add_click(user_id: 1, item_id: 1).should be_successful
-    sr.add_click(user_id: 1, item_id: "101-foo").should be_successful
-    sr.add_click(user_id: 1, item_id: "102-foo").should be_successful
+  it "tracks email clicks" do
+    # sr.add_email_click(user_id: 1, item_id: 1).should be_successful
+    sr.add_email_click(user_id: 1, item_id: "101-foo").should be_successful
+    sr.add_email_click(user_id: 1, item_id: "102-foo").should be_successful
+  end
+
+  it "tracks item views" do
+    # sr.add_email_click(user_id: 1, item_id: 1).should be_successful
+    sr.add_item_view(user_id: 1, item_id: "101-foo").should be_successful
+    sr.add_item_view(user_id: 1, item_id: "102-foo").should be_successful
   end
 
   it "batch tracks clicks" do
-    sr.batch_add_clicks(clicks: [
+    sr.batch_add_email_clicks(clicks: [
       { user_id: 100, item_id: "101-foo"},
       { user_id: 101, item_id: "102-foo"}
     ]).should be_successful
