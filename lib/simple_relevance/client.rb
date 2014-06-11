@@ -151,10 +151,6 @@ module SimpleRelevance
 
     private
 
-    def add_action_type(array_of_info_hashes, action_type)
-      array_of_info_hashes.map! {|info| info.merge!(action_type: action_type)}
-    end
-
     # SR API chokes on unescaped values like ampersands
     def cgi_escape_hash(hash)
       hash.inject({}) do |h, (k,v)|
