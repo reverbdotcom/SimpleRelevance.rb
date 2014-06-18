@@ -13,6 +13,8 @@ module SimpleRelevance
   class Client
     include HTTParty
 
+    BASE_URL = "https://api.simplerelevance.com/api/v3"
+
     # Tap into HTTParty debugging
     def self.enable_debug
       debug_output $stdout
@@ -141,12 +143,12 @@ module SimpleRelevance
     def _post(endpoint, post_data)
       data = cgi_escape_hash( post_data.merge(async: @async) )
 
-      self.class.post("https://www.simplerelevance.com/api/v3/#{endpoint}", basic_auth: @basic_auth, body: JSON.dump(data), options: {headers: {'Content-Type'=>'application/json', accept:'application/json'}})
+      self.class.post("#{BASE_URL}/#{endpoint}", basic_auth: @basic_auth, body: JSON.dump(data), options: {headers: {'Content-Type'=>'application/json', accept:'application/json'}})
     end
 
     def _get(endpoint, params)
       params = params.merge(async: @async)
-      self.class.get("https://www.simplerelevance.com/api/v3/#{endpoint}", basic_auth: @basic_auth, query: params)
+      self.class.get("#{BASE_URL}/#{endpoint}", basic_auth: @basic_auth, query: params)
     end
 
     private
