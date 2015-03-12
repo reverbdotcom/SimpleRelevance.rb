@@ -1,3 +1,5 @@
+# This gem is no longer maintained as we are not using SimpleRelevance. Here be dragons.
+
 # SimpleRelevance-Ruby
 
 A Ruby wrapper for the SimpleRelevance API (www.simplerelevance.com).
